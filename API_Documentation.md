@@ -61,3 +61,103 @@ GET /pharmacies/Keystone Pharmacy/masks?sortBy=name
   "error": "Pharmacy not found"
 }
 ```
+## 3. List all pharmacies with more or less than x mask products within a price range.
+
+**URL**: `/pharmacies/filter`
+
+**Method**: `GET`
+
+**Parameters**:
+- `minPriceVal` (query parameter): The lower bound of the price (required).
+- `maxPriceVal` (query parameter): The upper bound of the price (required).
+- `minMasksVal` (query parameter): The lower bound of the mask (required).
+- `maxMasksVal` (query parameter): The upper bound of the mask (required).
+
+**Example Request**:
+GET /pharmacies//filter?minPriceVal=10&maxPriceVal=100&minMasksVal=5&maxMasksVal=50
+
+**Response**:
+```json
+[
+  {
+    "name": "True Barrier (green) (3 per pack)",
+    "maskCount": 9
+  }
+]
+```
+**Error Response**:
+404 - Not Found: If the pharmacy is not found.
+```json
+{
+  "error": "No results were found to match the criteria."
+}
+```
+## 4. The top x users by total transaction amount of masks within a date range.
+
+**URL**: `/users/top`
+
+**Method**: `GET`
+
+**Parameters**:
+- `startDate` (query parameter): The day range (required).
+- `endDate` (query parameter): The day range (required).
+- `limit` (query parameter): Top x users (required).
+
+**Example Request**:
+GET /users/top?startDate=2021-01-01&endDate=2021-01-29&limit=3
+
+**Response**:
+```json
+[
+  {
+    "name": "Timothy Schultz",
+    "totalAmount": 178.28
+  }
+ {
+    "name": "Lester Arnold",
+    "totalAmount": 158.2
+  }
+ {
+    "name": "Wilbert Love",
+    "totalAmount": 135.16
+  }
+]
+```
+**Error Response**:
+404 - Not Found: If the pharmacy is not found.
+```json
+{
+  "error": "No results were found to match the criteria."
+}
+```
+## 5. The total amount of masks and dollar value of transactions within a date range.
+
+**URL**: `/transactions`
+
+**Method**: `GET`
+
+**Parameters**:
+- `startDate` (query parameter): The day range (required).
+- `endDate` (query parameter): The day range (required).
+
+**Example Request**:
+GET /transactions?startDate=2021-01-01&endDate=2021-01-29
+
+**Response**:
+```json
+[
+  {
+    "pharmacy_name": "Keystone Pharmacy",
+    "mask_name": "True Barrier (green) (3 per pack)",
+    "totalMasks": 95,
+    "totalValue": 1738.09
+  }
+]
+```
+**Error Response**:
+404 - Not Found: If the pharmacy is not found.
+```json
+{
+  "error": "No results were found to match the criteria."
+}
+```
