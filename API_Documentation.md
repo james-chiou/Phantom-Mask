@@ -7,8 +7,8 @@
 **Method**: `GET`
 
 **Parameters**:
-- `day` (query parameter): The opening day of the pharmacy.
-- `time` (query parameter): The opening hours of the pharmacy.
+- `day` (query parameter): The opening day of the pharmacy.  (required)
+- `time` (query parameter): The opening hours of the pharmacy. (required)
   
 **Example Request**:
 GET /pharmacies/open?day=Mon&time=10:00
@@ -38,8 +38,8 @@ GET /pharmacies/open?day=Mon&time=10:00
 **Method**: `GET`
 
 **Parameters**:
-- `name` (path parameter): The name of the pharmacy (required).
-- `sortBy` (query parameter): Sort by `name` or `price` (optional).
+- `name` (path parameter): The name of the pharmacy. (required)
+- `sortBy` (query parameter): Sort by `name` or `price`. (optional)
 
 **Example Request**:
 GET /pharmacies/Keystone Pharmacy/masks?sortBy=name
@@ -68,10 +68,10 @@ GET /pharmacies/Keystone Pharmacy/masks?sortBy=name
 **Method**: `GET`
 
 **Parameters**:
-- `minPriceVal` (query parameter): The lower bound of the price (required).
-- `maxPriceVal` (query parameter): The upper bound of the price (required).
-- `minMasksVal` (query parameter): The lower bound of the mask (required).
-- `maxMasksVal` (query parameter): The upper bound of the mask (required).
+- `minPriceVal` (query parameter): The lower bound of the price. (required)
+- `maxPriceVal` (query parameter): The upper bound of the price. (required)
+- `minMasksVal` (query parameter): The lower bound of the mask. (required)
+- `maxMasksVal` (query parameter): The upper bound of the mask. (required)
 
 **Example Request**:
 GET /pharmacies//filter?minPriceVal=10&maxPriceVal=100&minMasksVal=5&maxMasksVal=50
@@ -86,7 +86,7 @@ GET /pharmacies//filter?minPriceVal=10&maxPriceVal=100&minMasksVal=5&maxMasksVal
 ]
 ```
 **Error Response**:
-404 - Not Found: If the pharmacy is not found.
+404 - Not Found: If the range of the price or mask is not found.
 ```json
 {
   "error": "No results were found to match the criteria."
@@ -99,9 +99,9 @@ GET /pharmacies//filter?minPriceVal=10&maxPriceVal=100&minMasksVal=5&maxMasksVal
 **Method**: `GET`
 
 **Parameters**:
-- `startDate` (query parameter): The day range (required).
-- `endDate` (query parameter): The day range (required).
-- `limit` (query parameter): Top x users (required).
+- `startDate` (query parameter): The day range. (required)
+- `endDate` (query parameter): The day range. (required)
+- `limit` (query parameter): Top x users. (required)
 
 **Example Request**:
 GET /users/top?startDate=2021-01-01&endDate=2021-01-29&limit=3
@@ -124,7 +124,7 @@ GET /users/top?startDate=2021-01-01&endDate=2021-01-29&limit=3
 ]
 ```
 **Error Response**:
-404 - Not Found: If the pharmacy is not found.
+404 - Not Found: If the range of the date is not found.
 ```json
 {
   "error": "No results were found to match the criteria."
@@ -137,8 +137,8 @@ GET /users/top?startDate=2021-01-01&endDate=2021-01-29&limit=3
 **Method**: `GET`
 
 **Parameters**:
-- `startDate` (query parameter): The day range (required).
-- `endDate` (query parameter): The day range (required).
+- `startDate` (query parameter): The day range. (required)
+- `endDate` (query parameter): The day range. (required)
 
 **Example Request**:
 GET /transactions?startDate=2021-01-01&endDate=2021-01-29
@@ -155,9 +155,107 @@ GET /transactions?startDate=2021-01-01&endDate=2021-01-29
 ]
 ```
 **Error Response**:
-404 - Not Found: If the pharmacy is not found.
+404 - Not Found: If the range of the date is not found.
 ```json
 {
   "error": "No results were found to match the criteria."
+}
+```
+
+## 6. Search for pharmacies or masks by name, ranked by relevance to the search term.
+
+**URL**: `/search`
+
+**Method**: `GET`
+
+**Parameters**:
+- `name` (query parameter): The name of pharmacies or masks. (required)
+
+**Example Request (The query satisfies the pharmacy name)**:
+GET /search?name=PharmaMed 
+
+**Response**:
+```json
+pharmacies:
+[
+  {
+    "name": "PharmaMed",
+    "opening_hours": Mon - Wed 08:00 - 17:00 / Thur, Sat 20:00 - 02:00,
+  }
+],
+masks: []
+```
+**Example Request (The query satisfies the mask name)**:
+GET /search?name=Barrier 
+
+**Response**:
+```json
+"pharmacies": [],
+"masks":
+[
+  {
+    "mask": "True Barrier (black) (3 per pack)",
+    "pharmacy": "HealthMart",
+    "opening_hours": "Mon, Wed, Fri 08:00 - 12:00 / Tue, Thur 14:00 - 18:00",
+    "price": 3.38
+  }
+]
+```
+
+**Error Response**:
+404 - Not Found: If the query is not found.
+```json
+{
+  "error": "No results were found to match the input."
+}
+```
+## 7. Process a user purchases a mask from a pharmacy, and handle all relevant data changes in an atomic transaction.
+
+**URL**: `/users/purchase`
+
+**Method**: `POST`
+
+**Request Body**:
+- `userId`: The user's ID, to identify the user making the purchase. (required)
+- `pharmacyId`: The pharmacy ID is used to identify which pharmacy conducted the transaction. (required)
+- `maskId`: The ID of the mask is used to identify which mask was purchased. (required)
+- `quantity`: The number of masks purchased. (required)
+
+**Example Request**:
+POST /users/purchase
+```json
+{
+  "userId": 1,
+  "pharmacyId": 1,
+  "maskId": 1,
+  "quantity": 3
+}
+```
+
+**Response**:
+```json
+{
+  "message": "Purchase successful",
+  "totalCost": 41.099999999999994
+}
+```
+
+**Error Response**:
+404 - Not Found: If the user is not found.
+```json
+{
+  "error": "User not found"
+}
+
+404 - Not Found: If the pharmacy is not found.
+```json
+{
+  "error": "Mask not found in this pharmacy"
+}
+```
+400 - Bad Request: If the user's cash balance is insufficient.
+```json
+{
+  "error": "Insufficient balance"
 }
 ```
