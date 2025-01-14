@@ -67,24 +67,53 @@ router.get("/open", (req, res) => {
   });
 });
 
-// API 2: List all masks sold by a given pharmacy, sorted by mask name or price
-router.get("/:id/masks", (req, res) => {
-  const { id } = req.params;
+// API 2: List all masks sold by a given pharmacy by pharmacy name, sorted by mask name or price
+router.get("/:name/masks", (req, res) => {
+  const { name } = req.params;
   const { sortBy } = req.query;
-  let query = `SELECT * FROM Masks WHERE pharmacy_id = ?`;
-  if (sortBy === "name") {
-    query += " ORDER BY name";
-  } else if (sortBy === "price") {
-    query += " ORDER BY price";
-  }
-  db.all(query, [id], (err, rows) => {
+  
+  // Query to get pharmacy by name
+  const pharmacyQuery = "SELECT * FROM Pharmacies WHERE name = ?";
+  
+  db.get(pharmacyQuery, [name], (err, pharmacy) => {
     if (err) {
       res.status(500).send({ error: err.message });
       return;
     }
-    res.send(rows);
+    
+    if (!pharmacy) {
+      res.status(404).send({ error: "Pharmacy not found" });
+      return;
+    }
+    
+    const pharmacyId = pharmacy.id;
+    
+    // Query to get all masks sold by the pharmacy
+    let query = `SELECT name, price 
+                FROM Masks
+                WHERE pharmacy_id = ?`;
+    if (sortBy === "name") {
+      query += " ORDER BY name";
+    } else if (sortBy === "price") {
+      query += " ORDER BY price";
+    }
+    
+    db.all(query, [pharmacyId], (err, masks) => {
+      if (err) {
+        res.status(500).send({ error: err.message });
+        return;
+      }
+
+      const result = masks.map((mask) => ({
+        pharmacy: pharmacy.name,
+        ...mask
+      }));
+
+      res.send(result);
+    });
   });
 });
+
 
 // API 3: List all pharmacies with more or less than x mask products within a price range
 router.get("/filter", (req, res) => {
@@ -104,6 +133,10 @@ router.get("/filter", (req, res) => {
     (err, rows) => {
       if (err) {
         res.status(500).send({ error: err.message });
+        return;
+      }
+      if (rows.length === 0) {
+        res.status(404).send({ message: "No results were found to match the criteria." });
         return;
       }
       res.send(rows);

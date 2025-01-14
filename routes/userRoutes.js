@@ -21,6 +21,10 @@ router.get("/top", (req, res) => {
         res.status(500).send({ error: err.message });
         return;
       }
+      if (rows.length === 0) {
+        res.status(404).send({ message: "No results were found to match the criteria." });
+        return;
+      }
       res.send(rows);
     }
   );
@@ -43,7 +47,7 @@ router.post("/purchase", (req, res) => {
             res.status(404).send({ error: "Mask not found in this pharmacy" });
             return;
           }
-          const totalCost = mask.price * quantity;
+          const totalCost = Math.ceil(mask.price * quantity * 100) / 100;
           if (user.cash_balance < totalCost) {
             res.status(400).send({ error: "Insufficient balance" });
             return;

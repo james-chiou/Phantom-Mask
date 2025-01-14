@@ -30,7 +30,7 @@ app.use(cors());
 app.use("/pharmacies", pharmacyRoutes);
 app.use("/users", userRoutes);
 
-// API 5: Total mask transactions and dollar value within a date range
+// API 5: The total amount of masks and dollar value of transactions within a date range.
 app.get("/transactions", (req, res) => {
   const { startDay, endDay } = req.query;
   db.get(
@@ -41,6 +41,10 @@ app.get("/transactions", (req, res) => {
     (err, row) => {
       if (err) {
         res.status(500).send({ error: err.message });
+        return;
+      }
+      if (rows.length === 0) {
+        res.status(404).send({ message: "No results were found to match the criteria." });
         return;
       }
       res.send(row);
@@ -76,6 +80,11 @@ app.get("/search", (req, res) => {
         (err, maskRows) => {
           if (err) {
             res.status(500).send({ error: err.message });
+            return;
+          }
+
+          if (pharmacyRows.length === 0 && maskRows.length === 0) {
+            res.status(404).send({ message: "No results were found to match the input." });
             return;
           }
 
