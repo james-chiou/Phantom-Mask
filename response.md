@@ -1,6 +1,6 @@
 ## A. Required Information
 ### A.1. Requirement Completion Rate
-- [ ] List all pharmacies open at a specific time and on a day of the week if requested.
+- [x] List all pharmacies open at a specific time and on a day of the week if requested.
   - Implemented at "/pharmacies/open" API.
 - [x] List all masks sold by a given pharmacy, sorted by mask name or price.
   - Implemented at "/pharmacies/:name/masks" API.
@@ -12,14 +12,24 @@
   - Implemented at "/transactions" API.
 - [x] Search for pharmacies or masks by name, ranked by relevance to the search term.
   - Implemented at "/search" API.
-- [x] Process a user purchases a mask from a pharmacy, and handle all relevant data changes in an atomic transaction.
+- [x] Process a user purchases a mask from a pharmacy and handles all relevant data changes in an atomic transaction.
   - Implemented at "/users/purchase" API.
 ### A.2. API Document
-
+  Following the [API_Document.md](API_Documentation.md) and use the Postman to test the APIs.
 ### A.3. Import Data Commands
-Please run these two script commands to migrate the data into the database.
-
-```bash
-$ rake import_data:pharmacies[PATH_TO_FILE]
-$ rake import_data:users[PATH_TO_FILE]
+1. Please ensure the pharmacies.json and users.json files are in the database.  
+2. You can execute the program by running the
+```JavaScript
+node index.js
 ```
+or you can run the
+```JavaScript
+npm install nodemon -g
+nodemon index.js
+```
+If you succeed you can see the following message. Then you can follow the [A.2. API Document](https://github.com/james-chiou/Phantom-Mask/edit/master/response.md#a.2.-api-Ddocument) to test the APIs.
+```bash
+Database setup complete.
+Server is running on http://localhost:3000
+```
+
