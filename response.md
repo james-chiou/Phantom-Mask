@@ -1,4 +1,6 @@
 ## A. Required Information
+1. I use the Node.js, Express.js and sqlite3.js to complete this project.
+2. The compiler is Visual Studio Code.
 ### A.1. Requirement Completion Rate
 - [x] List all pharmacies open at a specific time and on a day of the week if requested.
   - Implemented at "/pharmacies/open" API.
@@ -32,4 +34,7 @@ If you succeed you can see the following message. Then you can follow the [A.2. 
 Database setup complete.
 Server is running on http://localhost:3000
 ```
+### A.4. Notice
+1. I am not familiar with Relational Data and building Relational Database, so I built the database with some tools such as Stackflow, Medium, and Chatgpt.
+2. No matter what the interview result will be, this project is a good practice and challenge to me.
 
