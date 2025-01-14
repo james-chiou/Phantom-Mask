@@ -27,7 +27,7 @@ or you can run the
 npm install nodemon -g
 nodemon index.js
 ```
-If you succeed you can see the following message. Then you can follow the [A.2. API Document](https://github.com/james-chiou/Phantom-Mask/edit/master/response.md#a.2.-api-Ddocument) to test the APIs.
+If you succeed you can see the following message. Then you can follow the [A.2. API Document](https://github.com/james-chiou/Phantom-Mask/blob/master/response.md#a2-api-document) to test the APIs.
 ```bash
 Database setup complete.
 Server is running on http://localhost:3000
